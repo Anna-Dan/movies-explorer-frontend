@@ -1,0 +1,23 @@
+.movies__button-more {
+  margin: 0 70px;
+  padding: 50px 0 80px;
+}
+
+.movies__button {
+  width: 100%;
+  padding: 11px 0 9px 0;
+  outline: none;
+  border-style: none;
+  border-radius: 6px;
+  background-color: #2f2f2f;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 15px;
+  color: #ffffff;
+  transition: opacity 0.2s linear;
+}
+
+.movies__button:hover {
+  opacity: 60%;
+  cursor: pointer;
+}
