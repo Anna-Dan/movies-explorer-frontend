@@ -68,3 +68,21 @@
 .movie__button_delete {
   background-image: url(../../images/delete-button.svg);
 }
+
+@media screen and (max-width: 1210px) {
+  .movie {
+    width: 339px;
+  }
+  .movie__image {
+    height: 190px;
+  }
+  .movie__duration {
+    margin: 0 0 14px 14px;
+  }
+  .movie__title {
+    margin: 14px 0 15px 14px;
+  }
+  .movie__button {
+    margin: 8px 14px 0 0;
+  }
+}

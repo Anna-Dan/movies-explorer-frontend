@@ -21,3 +21,10 @@
   opacity: 60%;
   cursor: pointer;
 }
+
+@media screen and (max-width: 1210px) {
+  .movies__button-more {
+    margin: 0 30px;
+    padding: 50px 0 100px;
+  }
+}
