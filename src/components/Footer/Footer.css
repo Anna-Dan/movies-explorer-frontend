@@ -100,3 +100,7 @@
     line-height: 15px;
   }
 }
+@media screen and (max-width: 400px) {
+  .footer {
+    padding: 79px 10px 10px;
+  }}

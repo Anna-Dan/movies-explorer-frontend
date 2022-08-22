@@ -12,6 +12,7 @@ function SearchForm() {
             type='text'
             required
           />
+
           <button type='submit' className='search__button'>
             <img
               src={findButton}

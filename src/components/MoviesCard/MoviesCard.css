@@ -86,3 +86,27 @@
     margin: 8px 14px 0 0;
   }
 }
+
+@media screen and (max-width: 420px) {
+  .movie {
+    width: 300px;
+  }
+  .movie__image {
+    height: 168px;
+  }
+  .movie__title {
+    max-width: 240px;
+    font-size: 12px;
+    line-height: 15px;
+    margin: 14px 0 14px 14px;
+  }
+  .movie__duration {
+    font-size: 10px;
+    line-height: 12px;
+    color: #8b8b8b;
+    margin: 0 0 14px 14px;
+  }
+  .movie__button {
+    margin: 8px 10px 0 0;
+  }
+}
