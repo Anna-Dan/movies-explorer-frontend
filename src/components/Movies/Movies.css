@@ -1,3 +1,7 @@
+.movies__page {
+  min-height: calc(100vh - 277px);
+}
+
 .movies__button-more {
   margin: 0 70px;
   padding: 50px 0 80px;
@@ -22,16 +26,15 @@
   cursor: pointer;
 }
 
-@media screen and (max-width: 1210px) {
+@media screen and (max-width: 900px) {
   .movies__button-more {
     margin: 0 30px;
-    padding: 50px 0 100px;
+    padding: 50px 0 80px;
   }
 }
 
 @media screen and (max-width: 400px) {
   .movies__button-more {
     margin: 0 10px;
-    padding: 50px 0 80px;
   }
 }

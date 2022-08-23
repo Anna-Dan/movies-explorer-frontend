@@ -17,7 +17,7 @@
 }
 
 .portfolio__project {
-  padding: 20px 0 19px;
+  padding: 21px 0 19px;
   border-bottom: 1px solid #e8e8e8;
 }
 
@@ -46,7 +46,7 @@
 
 @media screen and (max-width: 900px) {
   .portfolio {
-    padding: 0 50px 90px;
+    padding: 0 50px 70px;
   }
 
   .portfolio__header {
@@ -84,5 +84,9 @@
 @media screen and (max-width: 400px) {
   .portfolio {
     padding: 0 14px 51px;
+  }
+
+  .portfolio__project {
+    padding: 20px 0 19px;
   }
 }

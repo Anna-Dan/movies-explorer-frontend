@@ -5,7 +5,7 @@ import movies from '../../utils/MoviesArray';
 
 function Movies() {
   return (
-    <main className='movies-page'>
+    <main className='movies__page'>
       <SearchForm />
       <MoviesCardList movies={movies} />
       <div className='movies__button-more'>

@@ -19,6 +19,7 @@ const savedMovies = [
     image:
       'https://api.nomoreparties.co/uploads/medium_667708311_1280x720_558f3de42b.jpeg',
   },
+  
 ];
 
 export default savedMovies;
