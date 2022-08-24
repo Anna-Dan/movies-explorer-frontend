@@ -5,6 +5,7 @@ import Main from '../Main/Main';
 import Footer from '../Footer/Footer';
 import Movies from '../Movies/Movies';
 import SavedMovies from '../SavedMovies/SavedMovies';
+import Profile from '../Profile/Profile';
 
 function App() {
   return (
@@ -24,6 +25,10 @@ function App() {
           <Header isLoggedIn={true} />
           <SavedMovies />
           <Footer />
+        </Route>
+        <Route exact path="/profile">
+          <Header isLoggedIn={true} />
+          <Profile />
         </Route>
       </Switch>
     </div>
