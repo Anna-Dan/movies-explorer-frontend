@@ -5,6 +5,7 @@ import Main from '../Main/Main';
 import Footer from '../Footer/Footer';
 import Movies from '../Movies/Movies';
 import SavedMovies from '../SavedMovies/SavedMovies';
+import Register from '../Register/Register';
 import Profile from '../Profile/Profile';
 
 function App() {
@@ -26,7 +27,10 @@ function App() {
           <SavedMovies />
           <Footer />
         </Route>
-        <Route exact path="/profile">
+        <Route exact path='/signup'>
+          <Register />
+        </Route>
+        <Route exact path='/profile'>
           <Header isLoggedIn={true} />
           <Profile />
         </Route>
