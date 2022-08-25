@@ -17,7 +17,7 @@ function Login() {
               type='email'
               name='email'
               className='form__field'
-              value='pochta@yandex.ru'
+              defaultValue='pochta@yandex.ru'
               required
             />
             <span className='form__error-text'>Что-то пошло не так...</span>
@@ -28,7 +28,7 @@ function Login() {
               type='password'
               name='password'
               className='form__field'
-              value=''
+              defaultValue=''
               required
             />
             <span className='form__error-text'>Что-то пошло не так...</span>

@@ -16,7 +16,7 @@ function Register() {
               type='text'
               name='name'
               className='form__field'
-              value='Виталий'
+              defaultValue='Виталий'
               required
             />
             <span className='form__error-text'>Что-то пошло не так...</span>
@@ -27,7 +27,7 @@ function Register() {
               type='email'
               name='email'
               className='form__field'
-              value='pochta@yandex.ru'
+              defaultValue='pochta@yandex.ru'
               required
             />
             <span className='form__error-text'>Что-то пошло не так...</span>
@@ -38,7 +38,7 @@ function Register() {
               type='password'
               name='password'
               className='form__field form__field_color-error'
-              value='••••••••••••••'
+              defaultValue='••••••••••••••'
               required
             />
             <span className='form__error-text form__error-text_active'>

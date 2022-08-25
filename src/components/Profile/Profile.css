@@ -38,6 +38,11 @@
   border-bottom: 1px solid #424242;
 }
 
+.profile__data:focus {
+  outline: none;
+  border-bottom-color: #4285f4;
+}
+
 .profile__input:last-of-type {
   padding-top: 17px;
   padding-bottom: 0;
@@ -80,6 +85,12 @@
   color: #ffffff;
 }
 
+.profile__data:focus {
+  outline: none;
+  border-bottom: 0.5px solid #424242;
+  margin-bottom: -0.5px;
+}
+
 .profile__button-edit {
   margin: 221px 0 16px;
   border: none;
@@ -97,6 +108,10 @@
 .profile__button-edit:hover {
   opacity: 60%;
   cursor: pointer;
+}
+
+.profile__button-edit:disabled {
+  opacity: 30%;
 }
 
 .profile__button-exit {
