@@ -7,18 +7,18 @@ function Profile() {
       <form className='profile__form'>
         <h3 className='profile__greeting'>Привет, Виталий!</h3>
         <div className='profile__inputs'>
-          <p className='profile__input'>Имя</p>
+          <p className='profile__input-title'>Имя</p>
           <div className='profile__input-text profile__input-text_name'>
-            <input className='profile__data' defaultValue='Виталий' required />
+            <input className='profile__input' defaultValue='Виталий' required />
           </div>
           <div className='profile__input-text profile__input-text_email'>
             <input
-              className='profile__data'
+              className='profile__input'
               defaultValue='pochta@yandex.ru'
               required
             />
           </div>
-          <p className='profile__input'>E-mail</p>
+          <p className='profile__input-title'>E-mail</p>
         </div>
         <Link to='/profile' className='profile__button-edit'>
           Редактировать
