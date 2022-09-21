@@ -1,0 +1,44 @@
+.authorization__buttons {
+  display: flex;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.authorization__button {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 133%;
+  letter-spacing: 0.4px;
+  text-decoration: none;
+  transition: opacity 0.2s linear;
+}
+
+.authorization__button:hover {
+  opacity: 60%;
+  cursor: pointer;
+}
+
+.authorization_signup {
+  color: #ffffff;
+}
+
+.authorization_signin {
+  color: #000000;
+  background-color: #3ddc84;
+  margin-left: 30px;
+  padding: 8px 20px;
+  border-radius: 3px;
+}
+
+@media screen and (max-width: 640px) {
+  .authorization__button {
+    font-size: 10px;
+  }
+
+  .authorization_signin {
+    margin-left: 14px;
+    padding: 7px 12px;
+  }
+}
