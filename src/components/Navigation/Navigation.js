@@ -31,6 +31,7 @@ function Navigation() {
                 to='/'
                 className='navigation__link'
                 activeClassName='navigation__link_active'
+                onClick={handleToggleMenu}
               >
                 Главная
               </Link>
@@ -40,6 +41,7 @@ function Navigation() {
                 to='/movies'
                 className='navigation__link'
                 activeClassName='navigation__link_active'
+                onClick={handleToggleMenu}
               >
                 Фильмы
               </NavLink>
@@ -49,6 +51,7 @@ function Navigation() {
                 to='/saved-movies'
                 className='navigation__link'
                 activeClassName='navigation__link_active'
+                onClick={handleToggleMenu}
               >
                 Сохранённые фильмы
               </NavLink>
@@ -57,6 +60,7 @@ function Navigation() {
             <NavLink
               to='/profile'
               className='navigation__link navigation__link_profile'
+              onClick={handleToggleMenu}
             >
               Аккаунт <div className='navigation__account-icon'></div>
             </NavLink>
