@@ -115,6 +115,8 @@
 }
 
 .profile__button-exit {
+  border: none;
+  background-color: transparent;
   color: #ee3465;
   font-size: 13px;
   font-weight: 500;
