@@ -1,49 +1,31 @@
+import React, { useEffect, useState, useCallback } from 'react';
 import './Profile.css';
-import React from 'react';
-import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 
-function Profile({ onEditProfile, onSignOut }) {
-  const currentUser = React.useContext(CurrentUserContext);
-  const [name, setName] = React.useState(currentUser.name);
-  const [previousName, setPreviousName] = React.useState(currentUser.name);
-  const [email, setEmail] = React.useState(currentUser.email);
-  const [previousEmail, setPreviousEmail] = React.useState(currentUser.email);
-  const [isActiveButton, setIsActiveButton] = React.useState(false);
+function Profile({
+  onSignout,
+  onProfileEdit,
+  requestStatus: { message },
+  currentUser,
+}) {
+  const [name, setName] = useState(currentUser.name);
+  const [previousName, setPreviousName] = useState(currentUser.name);
+  const [email, setEmail] = useState(currentUser.email);
+  const [previousEmail, setPreviousEmail] = useState(currentUser.email);
+  const [isDisabled, setDisabled] = useState(false);
+  const [requestStatusText, setRequestStatusText] = useState('');
 
-  //обновление данных, сохранение в локальном хранилище
-  const handleSubmit = (evt) => {
-    evt.preventDefault();
-    setIsActiveButton(false);
-    onEditProfile({ name, email });
+  useEffect(() => {
+    setRequestStatusText(message);
+  }, [message]);
+
+  const handleSubmit = useCallback((e) => {
+    e.preventDefault();
     localStorage.setItem('name', name);
-    localStorage.setItem('email', email).catch((err) => {
-      console.log(err);
-    });
-  };
-
-  //ввод данных, сверка со старыми
-  function handleUserName(evt) {
-    const value = evt.target.value;
-    setName(value);
-    if (value !== previousName) {
-      setIsActiveButton(true);
-    } else {
-      setIsActiveButton(false);
-    }
-  }
-
-  //ввод данных, сверка со старыми
-  function handleUserEmail(evt) {
-    const value = evt.target.value;
-    setEmail(value);
-    if (value !== previousEmail) {
-      setIsActiveButton(true);
-    } else {
-      setIsActiveButton(false);
-    }
-  }
-
-  React.useEffect(() => {
+    localStorage.setItem('email', email);
+    onProfileEdit({ name, email });
+    setDisabled(false);
+  });
+  useEffect(() => {
     const localStorageName = localStorage.getItem('name');
     if (localStorageName) {
       setPreviousName(localStorageName);
@@ -52,17 +34,44 @@ function Profile({ onEditProfile, onSignOut }) {
     if (localStorageEmail) {
       setPreviousEmail(localStorageEmail);
     }
-  }, []);
+  }, [handleSubmit]);
+
+  const handleUserName = (e) => {
+    const value = e.target.value;
+    const err = e.target.validationMessage;
+    setName(value);
+    if (value !== previousName && !err) {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  };
+  const handleUserEmail = (e) => {
+    const value = e.target.value;
+    const err = e.target.validationMessage;
+
+    setEmail(value);
+    if (value !== previousEmail && !err) {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  };
 
   return (
     <section className='profile'>
       <form className='profile__form' onSubmit={handleSubmit}>
-        <h3 className='profile__greeting'>Привет, {name}!</h3>
+        <h3 className='profile__greeting'>Привет, {currentUser.name}!</h3>
         <div className='profile__inputs'>
           <p className='profile__input-title'>Имя</p>
           <div className='profile__input-text profile__input-text_name'>
             <input
               className='profile__input'
+              type='text'
+              name='name'
+              placeholder='Имя'
+              minLength='4'
+              maxLength='30'
               value={name}
               onChange={handleUserName}
               required
@@ -71,20 +80,32 @@ function Profile({ onEditProfile, onSignOut }) {
           <div className='profile__input-text profile__input-text_email'>
             <input
               className='profile__input'
+              type='text'
+              name='email'
+              pattern='[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'
+              placeholder='Ваш email'
+              minLength={2}
               value={email}
               onChange={handleUserEmail}
+              autoComplete='off'
               required
             />
           </div>
           <p className='profile__input-title'>E-mail</p>
         </div>
-        <button className='profile__button-edit' disabled={!isActiveButton}>
+        <span className='profile__message'>{requestStatusText}</span>
+
+        <button
+          className='profile__button-edit'
+          type='submit'
+          disabled={!isDisabled}
+        >
           Редактировать
         </button>
         <button
           className='profile__button-exit'
           type='button'
-          onClick={onSignOut}
+          onClick={onSignout}
         >
           Выйти из аккаунта
         </button>

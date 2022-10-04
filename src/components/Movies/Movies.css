@@ -26,6 +26,21 @@
   cursor: pointer;
 }
 
+.movies__button_disabled {
+  display: none;
+}
+
+.movies__status{
+  display: flex;
+  justify-content: center;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 23px;
+  color: #ffffff;
+  padding-top: 70px;
+  padding-bottom: 20px;
+}
+
 @media screen and (max-width: 900px) {
   .movies__button-more {
     margin: 0 30px;

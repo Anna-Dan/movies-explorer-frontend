@@ -1,210 +1,267 @@
-import { useState, useEffect } from 'react';
+import './App.css';
+import React, { useState, useEffect } from 'react';
 import {
   Route,
   Switch,
-  Redirect,
   useHistory,
+  Redirect,
   useLocation,
 } from 'react-router-dom';
+import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 
-import CurrentUserContext from '../../contexts/CurrentUserContext';
-
-import './App.css';
 import Header from '../Header/Header';
 import Main from '../Main/Main';
-import Footer from '../Footer/Footer';
 import Movies from '../Movies/Movies';
-import SavedMovies from '../SavedMovies/SavedMovies';
-import Register from '../Register/Register';
-import Login from '../Login/Login';
+import Footer from '../Footer/Footer';
 import Profile from '../Profile/Profile';
+import Login from '../Login/Login';
+import Register from '../Register/Register';
 import PageNotFound from '../PageNotFound/PageNotFound';
-import mainApi from '../../utils/MainApi';
+import SavedMovies from '../SavedMovies/SavedMovies';
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
-import InfoTooltip from '../InfoTooltip/InfoTooltip';
-import picFail from '../../images/error.svg';
+
+import mainApi from '../../utils/MainApi';
 
 function App() {
-  const history = useHistory();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [isTooltipOpened, setIsTooltipOpened] = useState(false);
-  const [MessageImage, setMessageImage] = useState('');
-  const [MessageText, setMessageText] = useState('');
-  const [savedMoviesList, setSavedMoviesList] = useState([]);
+  const [savedMoviesUser, setSavedMoviesUser] = useState([]);
+  const [isRegisterSending, setRegisterSending] = useState(true);
+  const [isRegisterStatus, setRegisterStatus] = useState({});
+
+  const [isLoginSending, setLoginSending] = useState(true);
+  const [isLoginStatus, setLoginStatus] = useState({});
+
+  const [isProfileSending, setProfileSending] = useState(false);
+  const [isProfileStatus, setProfileStatus] = useState({});
+
+  const [message, setMessage] = useState('');
+
+  const history = useHistory();
   const { pathname } = useLocation();
 
-  //регистрация пользователя
-  function handleRegister(data) {
+  const handleRegister = (user) => {
+    setRegisterSending(false);
     mainApi
-      .register(data)
-      .then((res) => {
-        if (res) {
-          handleLogin(data);
+      .register(user)
+      .then(() => {
+        handleLogin({
+          email: user.email,
+          password: user.password,
+        });
+      })
+      .catch((err) => {
+        if (err.statusCode === 409) {
+          setRegisterStatus({
+            message: 'email busy',
+          });
+        } else {
+          setRegisterStatus({
+            message: 'register error',
+          });
         }
       })
-      .catch(() => {
-        setMessageImage(picFail);
-        setMessageText('Пользователь с таким email существует');
-        handleInfoTooltip();
+      .finally(() => {
+        setRegisterSending(true);
       });
-  }
-
-  //авторизация пользователя
-  function handleLogin(data) {
+  };
+  const handleLogin = (data) => {
+    setLoginSending(false);
     mainApi
-      .login(data)
+      .authorize(data)
       .then((res) => {
-        if (res.token) {
-          localStorage.setItem('jwt', res.token);
-          setIsLoggedIn(true);
-          history.push('/movies');
+        localStorage.setItem('jwt', res.token);
+        setLoggedIn(true);
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        history.push('/movies');
+      })
+      .catch((err) => {
+        if (err.statusCode === 401) {
+          setLoginStatus({
+            message: 'wrong log or pass',
+          });
+        } else if (err.statusCode === 400) {
+          setLoginStatus({
+            message: 'token broken',
+          });
+        } else {
+          setLoginStatus({
+            message: 'Ошибка авторизации',
+          });
         }
       })
-      .catch(() => {
-        setMessageImage(picFail);
-        setMessageText('Неправильная почта или пароль');
-        handleInfoTooltip();
+      .finally(() => {
+        setLoginSending(true);
       });
-  }
+  };
 
-  //выход пользователя из аккаунта
+  const handleProfileEdit = (user) => {
+    setProfileStatus({});
+    setProfileSending(true);
+    mainApi
+      .editUser(user)
+      .then((newUser) => {
+        setCurrentUser(newUser);
+        setProfileStatus({
+          message: 'Профиль обновлён',
+        });
+      })
+      .catch((err) => {
+        if (err.statusCode === 409) {
+          setProfileStatus({
+            message: 'Пользователь с таким email уже существует',
+          });
+        } else {
+          setProfileStatus({
+            message: 'При обновлении профиля произошла ошибка',
+          });
+        }
+      })
+      .finally(() => {
+        setProfileSending(false);
+      });
+  };
+
   const handleSignOut = () => {
-    setCurrentUser({});
-    setIsLoggedIn(false);
+    setLoggedIn(false);
     localStorage.clear();
+    setLoginStatus({});
+    setRegisterStatus({});
+    setProfileStatus({});
     history.push('/');
   };
 
-  //проверка авторизации пользователя
+  const handleCardLike = (movie) => {
+    mainApi
+      .postMovie(movie)
+      .then((newMovie) => {
+        setSavedMoviesUser((movies) => [newMovie, ...movies]);
+        newMovie.isLiked = true;
+      })
+      .catch(() => {
+        setMessage('При сохранении фильма произошла ошибка');
+      });
+  };
+
+  const handleCardDelete = (movie) => {
+    mainApi
+      .deleteMovies(movie)
+      .then(() => {
+        setSavedMoviesUser((movies) =>
+          movies.filter((m) => m._id !== movie._id)
+        );
+      })
+      .catch(() => {
+        setMessage('При удалении фильма произошла ошибка');
+      });
+  };
+
   useEffect(() => {
     const jwt = localStorage.getItem('jwt');
     if (jwt) {
       mainApi
-        .getUserInfo()
-        .then((data) => {
-          if (data) {
-            setIsLoggedIn(true);
+        .validateToken(jwt)
+        .then((res) => {
+          if (res) {
+            setLoggedIn(true);
+            history.push(pathname);
           }
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
+          setMessage('Пользовательский формат токена неверен');
         });
     }
-  }, [history]);
+  }, []);
 
-  //получение информации о пользователе
   useEffect(() => {
-    if (isLoggedIn) {
+    if (loggedIn) {
       mainApi
-        .getUserInfo()
-        .then((res) => {
-          setCurrentUser(res);
+        .getUser()
+        .then((user) => {
+          setCurrentUser(user);
         })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          setIsLoading(false);
+        .catch(() => {
+          setMessage('Ошибка авторизации');
         });
     }
-  }, [isLoggedIn]);
+  }, [loggedIn]);
 
-  //редактирование информации о пользователе
-  function handleUpdateUser(newUserData) {
-    mainApi
-      .updateUserInfo(newUserData)
-      .then((res) => {
-        setCurrentUser(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
-  //открытие попапа с информацией
-  function handleInfoTooltip() {
-    setIsTooltipOpened(true);
-  }
-
-  //закрытие попапа с информацией
-  function closeInfoTooltip() {
-    setIsTooltipOpened(false);
-  }
+  useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if (jwt) {
+      mainApi
+        .getMovies(jwt)
+        .then((data) => {
+          setSavedMoviesUser(data.filter((i) => i.owner === currentUser._id));
+        })
+        .catch(() => {
+          setMessage('Ошибка при загрузке сохраненных фильмов');
+        });
+    }
+  }, [currentUser]);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      <div className='App'>
-        <Header isLoggedIn={isLoggedIn} isLoading={isLoading} />
+      <div className='page'>
+        <Header loggedIn={loggedIn} />
+
         <Switch>
           <Route exact path='/'>
             <Main />
           </Route>
 
           <ProtectedRoute
-            isLoggedIn={isLoggedIn}
             path='/movies'
             component={Movies}
-            user={currentUser}
-            savedMoviesList={savedMoviesList}
+            loggedIn={loggedIn}
+            cards={savedMoviesUser}
+            onCardLike={handleCardLike}
+            onCardDelete={handleCardDelete}
           />
 
           <ProtectedRoute
             path='/saved-movies'
-            isLoggedIn={isLoggedIn}
             component={SavedMovies}
-            user={currentUser}
-            savedMoviesList={savedMoviesList}
+            loggedIn={loggedIn}
+            cards={savedMoviesUser}
+            onCardDelete={handleCardDelete}
           />
 
           <ProtectedRoute
             path='/profile'
-            isLoggedIn={isLoggedIn}
             component={Profile}
-            isLoading={isLoading}
-            onEditProfile={handleUpdateUser}
-            onSignOut={handleSignOut}
+            loggedIn={loggedIn}
+            onSignout={handleSignOut}
+            onProfileEdit={handleProfileEdit}
+            isSending={isProfileSending}
+            requestStatus={isProfileStatus}
+            currentUser={currentUser}
           />
 
           <Route path='/signin'>
-            {() =>
-              !isLoggedIn ? (
-                <Login onLogin={handleLogin} />
-              ) : (
-                <Redirect to='/movies' />
-              )
-            }
+            {loggedIn ? (
+              <Redirect to='/' />
+            ) : (
+              <Login onLogin={handleLogin} requestStatus={isLoginStatus} />
+            )}
           </Route>
 
           <Route path='/signup'>
-            {() =>
-              !isLoggedIn ? (
-                <Register onRegister={handleRegister} />
-              ) : (
-                <Redirect to='/movies' />
-              )
-            }
+            {loggedIn ? (
+              <Redirect to='/' />
+            ) : (
+              <Register
+                onRegister={handleRegister}
+                requestStatus={isRegisterStatus}
+              />
+            )}
           </Route>
 
           <Route path='*'>
             <PageNotFound />
           </Route>
         </Switch>
-
-        {pathname === '/' ||
-        pathname === '/movies' ||
-        pathname === '/saved-movies' ? (
-          <Footer />
-        ) : (
-          ''
-        )}
-        <InfoTooltip
-          image={MessageImage}
-          text={MessageText}
-          isOpen={isTooltipOpened}
-          onClose={closeInfoTooltip}
-        />
+        <Footer />
       </div>
     </CurrentUserContext.Provider>
   );

@@ -1,163 +1,87 @@
-// const BASE_URL = 'https://api.diploma.danilenkoad.nomoredomains.sbs';
-
-// function checkResult(res) {
-//   if (res.ok) {
-//     return res.json();
-//   }
-//   return Promise.reject(`Ошибка: ${res.status}`);
-// }
-
-// export const register = ({ name, email, password }) => {
-//   return fetch(`${BASE_URL}/signup`, {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify({
-//       name,
-//       email,
-//       password,
-//     }),
-//   }).then((res) => checkResult(res));
-// };
-
-// export const authorize = ({ email, password }) => {
-//   return fetch(`${BASE_URL}/signin`, {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify({
-//       email,
-//       password,
-//     }),
-//   }).then((res) =>  {
-//     if (res.ok) {
-//       return res.json();
-//     }
-//     return Promise.reject(`Ошибка ${res.status}`);
-//   })
-//   .then((data) => {
-//     if (data.token) {
-//       localStorage.setItem("token", data.token);
-//     }
-//     return data;
-//   });
-// };
-
-// export const getUserInfo = (token) => {
-//   return fetch(`${BASE_URL}/users/me`, {
-//     method: 'GET',
-//     headers: {
-//       'Content-Type': 'application/json',
-//       Authorization: `Bearer ${token}`,
-//     },
-//   }).then((res) => checkResult(res));
-// };
-
 class MainApi {
   constructor({ baseUrl }) {
     this._baseUrl = baseUrl;
   }
-
-  _checkResult(res) {
+  _handleResp(res) {
     if (res.ok) {
       return res.json();
     }
-    return Promise.reject(`Ошибка: ${res.status}`);
+    return Promise.reject(res.status);
   }
-
+  get _headers() {
+    return {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+    };
+  }
   register({ name, email, password }) {
     return fetch(`${this._baseUrl}/signup`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, email, password }),
-    }).then(this._checkResult);
+      body: JSON.stringify({
+        name: name,
+        email: email,       
+        password: password,
+      }),
+    }).then(this._handleResp);
   }
-
-  login({ email, password }) {
+  authorize({ email, password }) {
     return fetch(`${this._baseUrl}/signin`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email, password }),
-    }).then(this._checkResult);
+    }).then(this._handleResp);
   }
+  validateToken = (token) => {
+    return fetch(`${this._baseUrl}/users/me`, {
+      headers: this._headers,
+    }).then(this._handleResp);
+  };
 
-  getUserInfo() {
+  getUser() {
     return fetch(`${this._baseUrl}/users/me`, {
       method: 'GET',
-      headers: {
-        authorization: `Bearer ${localStorage.getItem('jwt')}`,
-        "Content-Type": "application/json",
-      },
-    }).then(this._checkResult);
+      headers: this._headers,
+    }).then(this._handleResp);
   }
 
-  updateUserInfo(data) {
+  editUser(user) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: 'PATCH',
-      headers: {
-        authorization: `Bearer ${localStorage.getItem('jwt')}`,
-        "Content-Type": "application/json",
-      },
+      headers: this._headers,
       body: JSON.stringify({
-        name: data.name,
-        email: data.email,
+        name: user.name,
+        email: user.email,
       }),
-    }).then(this._checkResult);
+    }).then(this._handleResp);
   }
-
   getMovies() {
     return fetch(`${this._baseUrl}/movies`, {
-      method: 'GET',
-      headers: {
-        authorization: `Bearer ${localStorage.getItem('jwt')}`,
-      },
-    }).then(this._checkResult);
+      headers: this._headers,
+    }).then(this._handleResp);
   }
-
-  addMovies(data) {
-    return fetch(`${this._baseUrl}/movies`, {
+  postMovie(movie) {
+    return fetch(`${this._baseUrl}/movies/`, {
       method: 'POST',
-      headers: {
-        authorization: `Bearer ${localStorage.getItem('jwt')}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        country: data.country,
-        director: data.director,
-        duration: data.duration, 
-        year: data.year, 
-        description: data.description,
-        image: 'https://api.nomoreparties.co' + data.image.url,
-        trailerLink: data.trailerLink,
-        thumbnail: 'https://api.nomoreparties.co' + data.thumbnail,
-        movieId: data.id,
-        nameRU: data.nameRU,
-        nameEN: data.nameEN
-      }),
-    }).then(this._checkResult);
+      headers: this._headers,
+      body: JSON.stringify(movie),
+    }).then(this._handleResp);
   }
-
-  deleteMovies(movieId) {
-    return fetch(`${this._baseUrl}/movies/${movieId}`, {
+  deleteMovies(movie) {
+    return fetch(`${this._baseUrl}/movies/${movie._id}`, {
       method: 'DELETE',
-      headers: {
-        authorization: `Bearer ${localStorage.getItem('jwt')}`,
-      },
-    }).then(this._checkResult);
+      headers: this._headers,
+    }).then(this._handleResp);
   }
 }
 
 const mainApi = new MainApi({
-  baseUrl: 'https://api.diploma.danilenkoad.nomoredomains.sbs'
-  
+  baseUrl: 'https://api.diploma.danilenkoad.nomoredomains.sbs',
+  headers: { 'Content-Type': 'application/json' },
 });
 
 export default mainApi;
