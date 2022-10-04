@@ -1,7 +1,7 @@
 import { useLocation, Route } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import './SearchForm.css';
-import Slider from '../../utils/Slider/Slider';
+import Slider from '../Slider/Slider';
 import findButton from '../../images/find-button.svg';
 
 function SearchForm({ onSearchMovies }) {

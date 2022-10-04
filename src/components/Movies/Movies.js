@@ -113,7 +113,7 @@ function Movies({ cards, onCardClick, onCardLike, onCardDelete }) {
       setMoreResultsNumber(3);
     } else if (currentViewport >= 1280) {
       setFirstResultsNumber(12);
-      setMoreResultsNumber(4);
+      setMoreResultsNumber(3);
     }
   }, [currentViewport]);
 

@@ -20,7 +20,7 @@ function MoviesCard({
       onCardDelete(currentMovie);
     } else if (!isLiked) {
       onCardLike({
-        country: card.country,
+        country: card.country || 'Нет данных',
         director: card.director,
         duration: card.duration,
         year: card.year,
@@ -29,8 +29,8 @@ function MoviesCard({
         trailerLink: card.trailerLink,
         thumbnail: `${MoviesApiUrl}${card.image.formats.thumbnail.url}`,
         movieId: `${card.id}`,
-        nameRU: card.nameRU,
-        nameEN: card.nameEN,
+        nameRU: card.nameRU || 'Нет данных',
+        nameEN: card.nameEN || 'Нет данных',
         isLiked: true,
       });
     }
