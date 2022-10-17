@@ -5,6 +5,7 @@ import Slider from '../Slider/Slider';
 import findButton from '../../images/find-button.svg';
 
 function SearchForm({ onSearchMovies }) {
+  const [emptyRequest, setEmptyRequest] = useState(false);
   const [query, setQuery] = useState(localStorage.getItem('query') ?? '');
   const [querySaved, setQuerySaved] = useState('');
   const [checkboxStatus, setCheckboxStatus] = useState(
@@ -39,16 +40,27 @@ function SearchForm({ onSearchMovies }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!query) {
+      setEmptyRequest(true);
+      return;
+    }
     onSearchMovies(query, checkboxStatus);
   };
+
   const handleSubmitSavedMovie = (e) => {
     e.preventDefault();
+    if (!querySaved) {
+      setEmptyRequest(true);
+      return;
+    }
     onSearchMovies(querySaved, checkboxStatusSaved);
   };
   function handleChangeQuery(e) {
+    setEmptyRequest(false);
     setQuery(e.target.value);
   }
   function handleChangeQuerySaved(e) {
+    setEmptyRequest(false);
     setQuerySaved(e.target.value);
   }
 
@@ -70,7 +82,7 @@ function SearchForm({ onSearchMovies }) {
   return (
     <section className='search-form'>
       <Route path='/movies'>
-        <form className='search' onSubmit={handleSubmit}>
+        <form className='search' noValidate onSubmit={handleSubmit}>
           <div className='search__container'>
             <div className='search__line'>
               <input
@@ -89,6 +101,15 @@ function SearchForm({ onSearchMovies }) {
                 ></img>
               </button>
             </div>
+            <span
+              className={
+                emptyRequest
+                  ? 'search__error search__error_active'
+                  : 'search__error'
+              }
+            >
+              Нужно ввести ключевое слово
+            </span>
             <Slider
               onChange={handleCheckboxChange}
               shotMovies={checkboxStatus}
@@ -98,7 +119,7 @@ function SearchForm({ onSearchMovies }) {
       </Route>
 
       <Route path='/saved-movies'>
-        <form className='search' onSubmit={handleSubmitSavedMovie}>
+        <form className='search' noValidate onSubmit={handleSubmitSavedMovie}>
           <div className='search__container'>
             <div className='search__line'>
               <input
@@ -117,6 +138,15 @@ function SearchForm({ onSearchMovies }) {
                 ></img>
               </button>
             </div>
+            <span
+              className={
+                emptyRequest
+                  ? 'search__error search__error_active'
+                  : 'search__error'
+              }
+            >
+              Нужно ввести ключевое слово
+            </span>
             <Slider
               onChange={handleCheckboxChangeSaved}
               shotMovies={checkboxStatusSaved}

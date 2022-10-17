@@ -22,6 +22,14 @@ function useFormValidity() {
     [setValues, setErrors, setIsValid]
   );
 
-  return { values, handleChange, resetForm, errors, isValid };
+  return {
+    values,
+    handleChange,
+    resetForm,
+    errors,
+    isValid,
+    setValues,
+    setIsValid,
+  };
 }
 export default useFormValidity;

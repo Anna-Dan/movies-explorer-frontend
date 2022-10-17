@@ -169,6 +169,8 @@ function App() {
         })
         .catch(() => {
           setMessage('Пользовательский формат токена неверен');
+          setLoggedIn(false);
+          localStorage.clear();
         });
     }
   }, []);
@@ -203,7 +205,14 @@ function App() {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className='page'>
-        <Header loggedIn={loggedIn} />
+        {pathname === '/' ||
+        pathname === '/movies' ||
+        pathname === '/profile' ||
+        pathname === '/saved-movies' ? (
+          <Header loggedIn={loggedIn} />
+        ) : (
+          ''
+        )}
 
         <Switch>
           <Route exact path='/'>
@@ -235,7 +244,6 @@ function App() {
             onProfileEdit={handleProfileEdit}
             isSending={isProfileSending}
             requestStatus={isProfileStatus}
-            currentUser={currentUser}
           />
 
           <Route path='/signin'>

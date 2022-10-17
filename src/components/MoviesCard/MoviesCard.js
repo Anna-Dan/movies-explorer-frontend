@@ -20,21 +20,32 @@ function MoviesCard({
       onCardDelete(currentMovie);
     } else if (!isLiked) {
       onCardLike({
-        country: card.country || 'Нет данных',
+        country: `${card.country === null ? 'none' : card.country}`,
         director: card.director,
         duration: card.duration,
         year: card.year,
         description: card.description,
         image: `${MoviesApiUrl}${card.image.url}`,
-        trailerLink: card.trailerLink,
-        thumbnail: `${MoviesApiUrl}${card.image.formats.thumbnail.url}`,
+        trailerLink: isURL(card.trailerLink)
+          ? card.trailerLink
+          : 'https://diploma.danilenkoad.nomoredomains.sbs/notFound',
+        thumbnail: `${
+          card.image.formats.thumbnail.url === null
+            ? 'https://diploma.danilenkoad.nomoredomains.sbs/notFound'
+            : `${MoviesApiUrl}${card.image.formats.thumbnail.url}`
+        }`,
         movieId: `${card.id}`,
-        nameRU: card.nameRU || 'Нет данных',
-        nameEN: card.nameEN || 'Нет данных',
+        nameRU: `${card.nameRU === '' ? 'none' : card.nameRU}`,
+        nameEN: `${card.nameEN === '' ? 'none' : card.nameEN}`,
         isLiked: true,
       });
     }
   };
+
+  function isURL(url) {
+    var objRE = /(^https?:\/\/)?[a-z0-9~_\-\.]+\.[a-z]{2,9}(\/|:|\?[!-~]*)?$/i;
+    return objRE.test(url);
+  }
 
   function getMovieDuration(mins) {
     return `${Math.floor(mins / 60)}ч ${mins % 60}м`;

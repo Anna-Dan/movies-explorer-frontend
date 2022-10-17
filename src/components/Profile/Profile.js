@@ -1,12 +1,9 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
+import { CurrentUserContext } from '../../contexts/CurrentUserContext';
 import './Profile.css';
 
-function Profile({
-  onSignout,
-  onProfileEdit,
-  requestStatus: { message },
-  currentUser,
-}) {
+function Profile({ onSignout, onProfileEdit, requestStatus: { message } }) {
+  const currentUser = useContext(CurrentUserContext);
   const [name, setName] = useState(currentUser.name);
   const [previousName, setPreviousName] = useState(currentUser.name);
   const [email, setEmail] = useState(currentUser.email);

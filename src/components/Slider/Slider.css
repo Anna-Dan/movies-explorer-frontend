@@ -1,7 +1,6 @@
 .search__toggle {
   display: flex;
   align-items: center;
-  margin-top: 20px;
 }
 
 .search__check {
@@ -57,7 +56,6 @@
 @media screen and (max-width: 900px) {
   .search__toggle {
     flex-direction: row-reverse;
-    margin-top: 17px;
   }
   .search__short {
     margin-right: 16px;
@@ -67,7 +65,7 @@
 @media screen and (max-width: 420px) {
   .search__toggle {
     justify-content: center;
-    margin-top: 31px;
+    margin-top: 10px;
     padding-right: 14px;
   }
   .search__short {

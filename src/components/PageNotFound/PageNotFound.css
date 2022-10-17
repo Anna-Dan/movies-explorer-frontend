@@ -22,16 +22,18 @@
   margin: 0 0 184px;
 }
 
-.not-found__link {
+.not-found__button {
+  background-color: inherit;
+  border: none;
+  text-align: center;
   color: #4285f4;
-  text-decoration: none;
   font-weight: 400;
   font-size: 14px;
   line-height: 17px;
   transition: opacity 0.2s linear;
 }
 
-.not-found__link:hover {
+.not-found__button:hover {
   opacity: 60%;
   cursor: pointer;
 }
@@ -55,7 +57,7 @@
     margin: 0 0 284px;
   }
 
-  .not-found__link {
+  .not-found__button {
     font-size: 12px;
     line-height: 15px;
   }

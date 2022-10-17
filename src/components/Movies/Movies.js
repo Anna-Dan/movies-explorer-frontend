@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SearchForm from '../SearchForm/SearchForm';
 import MoviesCardList from '../MoviesCardList/MoviesCardList';
-
+import { moviesCount } from '../../utils/constants';
 import moviesApi from '../../utils/MoviesApi';
 import moviesFilter from '../../utils/MovieFilter';
 import './Movies.css';
@@ -12,14 +12,11 @@ function Movies({ cards, onCardClick, onCardLike, onCardDelete }) {
   const [checkboxStatus, setCheckboxStatus] = useState(
     JSON.parse(localStorage.getItem('checkboxStatus')) ?? false
   );
-
   const [initialMovies, setInitialMovies] = useState([]);
   const [moviesToRender, setMoviesToRender] = useState([]);
   const [filteredMovies, setFilteredMovies] = useState([]);
-
   const [isSearchMovies, setSearchMovies] = useState(false);
   const [searchStatus, setSearchStatus] = useState('');
-
   const [firstResultsNumber, setFirstResultsNumber] = useState(0);
   const [moreResultsNumber, setMoreResultsNumber] = useState(0);
   const [isMoreButtonVisible, setIsMoreButtonVisible] = useState(false);
@@ -45,27 +42,25 @@ function Movies({ cards, onCardClick, onCardLike, onCardDelete }) {
     if (!initialMoviesInLocalStorage) {
       setSearchMovies(true);
       moviesApi
-      .getMovies()
-      .then((data) => {
-        setInitialMovies(data);
-        localStorage.setItem('initialMovies', JSON.stringify(data));
-      })
-      .catch(() => {
-        setSearchStatus(
-          'Во время запроса произошла ошибка. Возможно, проблема с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз.'
+        .getMovies()
+        .then((data) => {
+          setInitialMovies(data);
+          localStorage.setItem('initialMovies', JSON.stringify(data));
+        })
+        .catch(() => {
+          setSearchStatus(
+            'Во время запроса произошла ошибка. Возможно, проблема с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз.'
           );
         })
         .finally(() => {
           setSearchMovies(false);
           setLoading(false);
         });
-      } else {
-        setInitialMovies(initialMoviesInLocalStorage);
-        setSearchStatus(
-          'Во время запроса произошла ошибка. Возможно, проблема с соединением или сервер недоступен. Подождите немного и попробуйте ещё раз.'
-          );
-          setLoading(false);
-        }
+    } else {
+      setInitialMovies(initialMoviesInLocalStorage);
+      setSearchStatus('Ничего не найдено');
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -102,18 +97,18 @@ function Movies({ cards, onCardClick, onCardLike, onCardDelete }) {
   }, [moviesToRender, filteredMovies]);
 
   useEffect(() => {
-    if (currentViewport <= 480) {
-      setFirstResultsNumber(5);
-      setMoreResultsNumber(2);
-    } else if (currentViewport <= 768) {
-      setFirstResultsNumber(8);
-      setMoreResultsNumber(2);
-    } else if (currentViewport <= 1279) {
-      setFirstResultsNumber(12);
-      setMoreResultsNumber(3);
-    } else if (currentViewport >= 1280) {
-      setFirstResultsNumber(12);
-      setMoreResultsNumber(3);
+    if (currentViewport >= moviesCount.large.width) {
+      setFirstResultsNumber(moviesCount.large.cards.total);
+      setMoreResultsNumber(moviesCount.large.cards.extra);
+    } else if (
+      currentViewport <= moviesCount.large.width &&
+      currentViewport > moviesCount.medium.width
+    ) {
+      setFirstResultsNumber(moviesCount.medium.cards.total);
+      setMoreResultsNumber(moviesCount.medium.cards.extra);
+    } else {
+      setFirstResultsNumber(moviesCount.small.cards.total);
+      setMoreResultsNumber(moviesCount.small.cards.extra);
     }
   }, [currentViewport]);
 
@@ -131,9 +126,7 @@ function Movies({ cards, onCardClick, onCardLike, onCardDelete }) {
           onCardDelete={onCardDelete}
         />
       ) : (
-        <span className='movies__status'>
-          {searchStatus || 'Ничего не найдено'}
-        </span>
+        <span className='movies__status'>{searchStatus}</span>
       )}
       {isLoading ? (
         <Preloader />
