@@ -1,53 +1,39 @@
+import React, { useEffect } from 'react';
 import Form from '../Form/Form';
 
-function Register() {
+import useFormValidity from '../../utils/FormValidity';
+
+function Register({ onRegister, requestStatus }) {
+  const { values, handleChange, resetForm, errors, isValid } =
+    useFormValidity();
+  const isDisabled = !isValid;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onRegister(values);
+  };
+  useEffect(() => {
+    resetForm({}, {}, false);
+  }, [resetForm]);
+
   return (
-    <Form
-      header='Добро пожаловать!'
-      submit='Зарегистрироваться'
-      question='Уже зарегистрированы?'
-      link='Войти'
-      path='/signin'
-      children={
-        <>
-          <label className='form__field'>
-            <h3 className='form__input-text'>Имя</h3>
-            <input
-              type='text'
-              name='name'
-              className='form__input'
-              defaultValue='Виталий'
-              required
-            />
-            <span className='form__error-text'>Что-то пошло не так...</span>
-          </label>
-          <label className='form__field'>
-            <h3 className='form__input-text'>E-mail</h3>
-            <input
-              type='email'
-              name='email'
-              className='form__input'
-              defaultValue='pochta@yandex.ru'
-              required
-            />
-            <span className='form__error-text'>Что-то пошло не так...</span>
-          </label>
-          <label className='form__field'>
-            <h3 className='form__input-text'>Пароль</h3>
-            <input
-              type='password'
-              name='password'
-              className='form__input form__input_color-error'
-              defaultValue='••••••••••••••'
-              required
-            />
-            <span className='form__error-text form__error-text_active'>
-              Что-то пошло не так...
-            </span>
-          </label>
-        </>
-      }
-    />
+    <section className='register'>
+      <Form
+        loginForm={false}
+        onSumbit={handleSubmit}
+        header={'Добро пожаловать!'}
+        btnName={'Зарегистрироваться'}
+        caption={'Уже зарегистрированы?'}
+        link={'Войти'}
+        path={'/signin'}
+        onChangeName={handleChange}
+        onChangeEmail={handleChange}
+        onChangePassword={handleChange}
+        isDisabled={isDisabled}
+        requestStatus={requestStatus}
+        errors={errors}
+      />
+    </section>
   );
 }
 

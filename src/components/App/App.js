@@ -1,49 +1,277 @@
-import { Route, Switch } from 'react-router-dom';
 import './App.css';
+import React, { useState, useEffect } from 'react';
+import {
+  Route,
+  Switch,
+  useHistory,
+  Redirect,
+  useLocation,
+} from 'react-router-dom';
+import { CurrentUserContext } from '../../contexts/CurrentUserContext';
+
 import Header from '../Header/Header';
 import Main from '../Main/Main';
-import Footer from '../Footer/Footer';
 import Movies from '../Movies/Movies';
-import SavedMovies from '../SavedMovies/SavedMovies';
-import Register from '../Register/Register';
-import Login from '../Login/Login';
+import Footer from '../Footer/Footer';
 import Profile from '../Profile/Profile';
+import Login from '../Login/Login';
+import Register from '../Register/Register';
 import PageNotFound from '../PageNotFound/PageNotFound';
+import SavedMovies from '../SavedMovies/SavedMovies';
+import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
+
+import mainApi from '../../utils/MainApi';
 
 function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState({});
+  const [savedMoviesUser, setSavedMoviesUser] = useState([]);
+  const [isRegisterSending, setRegisterSending] = useState(true);
+  const [isRegisterStatus, setRegisterStatus] = useState({});
+
+  const [isLoginSending, setLoginSending] = useState(true);
+  const [isLoginStatus, setLoginStatus] = useState({});
+
+  const [isProfileSending, setProfileSending] = useState(false);
+  const [isProfileStatus, setProfileStatus] = useState({});
+
+  const [message, setMessage] = useState('');
+
+  const history = useHistory();
+  const { pathname } = useLocation();
+
+  const handleRegister = (user) => {
+    setRegisterSending(false);
+    mainApi
+      .register(user)
+      .then(() => {
+        handleLogin({
+          email: user.email,
+          password: user.password,
+        });
+      })
+      .catch((err) => {
+        if (err.statusCode === 409) {
+          setRegisterStatus({
+            message: 'email busy',
+          });
+        } else {
+          setRegisterStatus({
+            message: 'register error',
+          });
+        }
+      })
+      .finally(() => {
+        setRegisterSending(true);
+      });
+  };
+  const handleLogin = (data) => {
+    setLoginSending(false);
+    mainApi
+      .authorize(data)
+      .then((res) => {
+        localStorage.setItem('jwt', res.token);
+        setLoggedIn(true);
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        history.push('/movies');
+      })
+      .catch((err) => {
+        if (err.statusCode === 401) {
+          setLoginStatus({
+            message: 'wrong log or pass',
+          });
+        } else if (err.statusCode === 400) {
+          setLoginStatus({
+            message: 'token broken',
+          });
+        } else {
+          setLoginStatus({
+            message: 'Ошибка авторизации',
+          });
+        }
+      })
+      .finally(() => {
+        setLoginSending(true);
+      });
+  };
+
+  const handleProfileEdit = (user) => {
+    setProfileStatus({});
+    setProfileSending(true);
+    mainApi
+      .editUser(user)
+      .then((newUser) => {
+        setCurrentUser(newUser);
+        setProfileStatus({
+          message: 'Профиль обновлён',
+        });
+      })
+      .catch((err) => {
+        if (err.statusCode === 409) {
+          setProfileStatus({
+            message: 'Пользователь с таким email уже существует',
+          });
+        } else {
+          setProfileStatus({
+            message: 'При обновлении профиля произошла ошибка',
+          });
+        }
+      })
+      .finally(() => {
+        setProfileSending(false);
+      });
+  };
+
+  const handleSignOut = () => {
+    setLoggedIn(false);
+    localStorage.clear();
+    setLoginStatus({});
+    setRegisterStatus({});
+    setProfileStatus({});
+    history.push('/');
+  };
+
+  const handleCardLike = (movie) => {
+    mainApi
+      .postMovie(movie)
+      .then((newMovie) => {
+        setSavedMoviesUser((movies) => [newMovie, ...movies]);
+        newMovie.isLiked = true;
+      })
+      .catch(() => {
+        setMessage('При сохранении фильма произошла ошибка');
+      });
+  };
+
+  const handleCardDelete = (movie) => {
+    mainApi
+      .deleteMovies(movie)
+      .then(() => {
+        setSavedMoviesUser((movies) =>
+          movies.filter((m) => m._id !== movie._id)
+        );
+      })
+      .catch(() => {
+        setMessage('При удалении фильма произошла ошибка');
+      });
+  };
+
+  useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if (jwt) {
+      mainApi
+        .validateToken(jwt)
+        .then((res) => {
+          if (res) {
+            setLoggedIn(true);
+            history.push(pathname);
+          }
+        })
+        .catch(() => {
+          setMessage('Пользовательский формат токена неверен');
+          setLoggedIn(false);
+          localStorage.clear();
+        });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (loggedIn) {
+      mainApi
+        .getUser()
+        .then((user) => {
+          setCurrentUser(user);
+        })
+        .catch(() => {
+          setMessage('Ошибка авторизации');
+        });
+    }
+  }, [loggedIn]);
+
+  useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if (jwt) {
+      mainApi
+        .getMovies(jwt)
+        .then((data) => {
+          setSavedMoviesUser(data.filter((i) => i.owner === currentUser._id));
+        })
+        .catch(() => {
+          setMessage('Ошибка при загрузке сохраненных фильмов');
+        });
+    }
+  }, [currentUser]);
+
   return (
-    <div className='App'>
-      <Switch>
-        <Route exact path='/'>
-          <Header isLoggedIn={false} />
-          <Main />
-          <Footer />
-        </Route>
-        <Route path='/movies'>
-          <Header isLoggedIn={true} />
-          <Movies />
-          <Footer />
-        </Route>
-        <Route path='/saved-movies'>
-          <Header isLoggedIn={true} />
-          <SavedMovies />
-          <Footer />
-        </Route>
-        <Route exact path='/signup'>
-          <Register />
-        </Route>
-        <Route exact path='/signin'>
-          <Login />
-        </Route>
-        <Route exact path='/profile'>
-          <Header isLoggedIn={true} />
-          <Profile />
-        </Route>
-        <Route path="*">
-          <PageNotFound />
-        </Route>
-      </Switch>
-    </div>
+    <CurrentUserContext.Provider value={currentUser}>
+      <div className='page'>
+        {pathname === '/' ||
+        pathname === '/movies' ||
+        pathname === '/profile' ||
+        pathname === '/saved-movies' ? (
+          <Header loggedIn={loggedIn} />
+        ) : (
+          ''
+        )}
+
+        <Switch>
+          <Route exact path='/'>
+            <Main />
+          </Route>
+
+          <ProtectedRoute
+            path='/movies'
+            component={Movies}
+            loggedIn={loggedIn}
+            cards={savedMoviesUser}
+            onCardLike={handleCardLike}
+            onCardDelete={handleCardDelete}
+          />
+
+          <ProtectedRoute
+            path='/saved-movies'
+            component={SavedMovies}
+            loggedIn={loggedIn}
+            cards={savedMoviesUser}
+            onCardDelete={handleCardDelete}
+          />
+
+          <ProtectedRoute
+            path='/profile'
+            component={Profile}
+            loggedIn={loggedIn}
+            onSignout={handleSignOut}
+            onProfileEdit={handleProfileEdit}
+            isSending={isProfileSending}
+            requestStatus={isProfileStatus}
+          />
+
+          <Route path='/signin'>
+            {loggedIn ? (
+              <Redirect to='/' />
+            ) : (
+              <Login onLogin={handleLogin} requestStatus={isLoginStatus} />
+            )}
+          </Route>
+
+          <Route path='/signup'>
+            {loggedIn ? (
+              <Redirect to='/' />
+            ) : (
+              <Register
+                onRegister={handleRegister}
+                requestStatus={isRegisterStatus}
+              />
+            )}
+          </Route>
+
+          <Route path='*'>
+            <PageNotFound />
+          </Route>
+        </Switch>
+        <Footer />
+      </div>
+    </CurrentUserContext.Provider>
   );
 }
 

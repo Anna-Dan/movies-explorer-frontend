@@ -1,9 +1,9 @@
-import React from 'react';
+import { useState } from 'react';
 import './Navigation.css';
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 function Navigation() {
-  const [showItems, setShowItems] = React.useState(false);
+  const [showItems, setShowItems] = useState(false);
 
   const handleToggleMenu = () => setShowItems(!showItems);
 
@@ -27,19 +27,21 @@ function Navigation() {
           ></button>
           <ul className='navigation__list'>
             <li className='navigation__list-item navigation__list-item_main'>
-              <Link
-                to='/'
+              <NavLink
+                exact to='/'
                 className='navigation__link'
                 activeClassName='navigation__link_active'
+                onClick={handleToggleMenu}
               >
                 Главная
-              </Link>
+              </NavLink>
             </li>
             <li className='navigation__list-item'>
               <NavLink
                 to='/movies'
                 className='navigation__link'
                 activeClassName='navigation__link_active'
+                onClick={handleToggleMenu}
               >
                 Фильмы
               </NavLink>
@@ -49,6 +51,7 @@ function Navigation() {
                 to='/saved-movies'
                 className='navigation__link'
                 activeClassName='navigation__link_active'
+                onClick={handleToggleMenu}
               >
                 Сохранённые фильмы
               </NavLink>
@@ -57,6 +60,7 @@ function Navigation() {
             <NavLink
               to='/profile'
               className='navigation__link navigation__link_profile'
+              onClick={handleToggleMenu}
             >
               Аккаунт <div className='navigation__account-icon'></div>
             </NavLink>

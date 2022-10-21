@@ -1,42 +1,38 @@
-import './Login.css';
+import React, { useEffect } from 'react';
 import Form from '../Form/Form';
+import useFormValidity from '../../utils/FormValidity';
 
-function Login() {
+function Login({ onLogin, requestStatus }) {
+  const { values, handleChange, resetForm, errors, isValid } =
+    useFormValidity();
+  const isDisabled = !isValid;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onLogin(values);
+  };
+
+  useEffect(() => {
+    resetForm({}, {}, false);
+  }, [resetForm]);
+
   return (
-    <Form
-      header='Рады видеть!'
-      submit='Войти'
-      question='Ещё не зарегистрированы?'
-      link='Регистрация'
-      path='/signup'
-      children={
-        <>
-          <label className='form__field'>
-            <h3 className='form__input-text'>E-mail</h3>
-            <input
-              type='email'
-              name='email'
-              className=' form__input'
-              defaultValue='pochta@yandex.ru'
-              required
-            />
-            <span className='form__error-text'>Что-то пошло не так...</span>
-          </label>
-          <label className='form__field'>
-            <h3 className='form__input-text'>Пароль</h3>
-            <input
-              type='password'
-              name='password'
-              className='form__input'
-              defaultValue=''
-              required
-            />
-            <span className='form__error-text'>Что-то пошло не так...</span>
-            <div className='form__login-aligh'></div>
-          </label>
-        </>
-      }
-    />
+    <section className='login'>
+      <Form
+        loginForm={true}
+        onSumbit={handleSubmit}
+        header={'Рады видеть!'}
+        btnName={'Войти'}
+        caption={'Ещё не зарегистрированы?'}
+        link={'Регистрация'}
+        path={'/signup'}
+        onChangeEmail={handleChange}
+        onChangePassword={handleChange}
+        isDisabled={isDisabled}
+        requestStatus={requestStatus}
+        errors={errors}
+      />
+    </section>
   );
 }
 
